@@ -8,6 +8,10 @@
 *.cmxs
 *.cmxa
 
+*.pytest_cache
+*.vscode
+Pifile
+
 # ocamlbuild working directory
 _build/
 
