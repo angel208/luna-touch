@@ -1,12 +1,59 @@
 import numpy as np
+import queue
+import threading
 
+import tkinter as tk
+from PIL import Image, ImageTk
 import cv2 as cv
 from primesense import openni2
 from primesense import _openni2 as c_api
 
-import _const, helpers
-#from . import _const
+from luna_touch import _const, helpers
+from luna_touch.animatedGif import AnimatedGif
 
+def run_calibration_process():
+
+    root = tk.Tk()
+    root.state('zoomed')
+    root.resizable(False, False)
+
+    image = Image.open('./luna_touch/res/calibrating.png')
+    background_image = ImageTk.PhotoImage(image)
+
+    background = tk.Label( root, image = background_image)
+    background.pack()
+
+    player1 = AnimatedGif('./luna_touch/res/calibrating.gif', frames=23, fps=40)
+
+    loading_gif = tk.Label(root)
+    loading_gif.configure(image = player1.currentFrame())
+    loading_gif.configure(background='white')
+    loading_gif.place( relheight = 0.2 , relwidth = 0.2, relx = 0.39 , rely = 0.63)
+
+
+    q = queue.Queue()
+    threading.Thread(target=request_surface_information, args=(q,) ).start()
+
+    while True:
+
+        loading_gif.configure(image = player1.nextFrame())
+        root.update()
+
+        if(not q.empty()):
+            surface_information = q.get_nowait()
+            print(surface_information)
+            return surface_information
+            break
+
+
+
+def request_surface_information( surface_information_queue ):
+
+    surface_information = get_surface_information()
+
+    surface_information_queue.put(surface_information)
+
+    return surface_information    
 
 def get_surface_information():
 
@@ -25,8 +72,8 @@ def get_surface_information():
 
 def get_surface_area_limits():
     # can also accept the path of the OpenNI redistribution
-    openni2.initialize("../lib")     
-    dev = openni2.Device.open_any()
+    openni2.initialize("lib")     
+    dev = helpers.open_kinect_device()
     color_stream = dev.create_color_stream()
     color_stream.start()
     color_stream.set_video_mode(c_api.OniVideoMode(pixelFormat = c_api.OniPixelFormat.ONI_PIXEL_FORMAT_RGB888, resolutionX = 640, resolutionY = 480, fps = 30))
@@ -81,12 +128,12 @@ def get_surface_area_limits():
 
 def get_surface_distance( touch_area_limits ):
 
-    return 713
+    return 718
 
     # can also accept the path of the OpenNI redistribution
     openni2.initialize("../lib")     
 
-    dev = openni2.Device.open_any()
+    dev = helpers.open_kinect_device()
     depth_stream = dev.create_depth_stream()
     depth_stream.start()
     depth_stream.set_video_mode(c_api.OniVideoMode(pixelFormat = c_api.OniPixelFormat.ONI_PIXEL_FORMAT_DEPTH_1_MM, resolutionX = 640, resolutionY = 480, fps = 30))

@@ -1,3 +1,17 @@
 {
-  "tests/test_calibration_distance.py": true
+  "tests/test_calibration_distance.py::test_distance_calculation_from_calibration_frame[calibration_frame0-1097]": true,
+  "tests/test_calibration_distance.py::test_distance_calculation_from_calibration_frame[calibration_frame1-1097]": true,
+  "tests/test_calibration_distance.py::test_distance_calculation_from_calibration_frame[calibration_frame2-1114]": true,
+  "tests/test_calibration_distance.py::test_distance_calculation_from_calibration_frame[calibration_frame3-1133]": true,
+  "tests/test_tracking_touches.py::test_touch_tracking_data_for_missing_touches": true,
+  "tests/test_tracking_touches.py::test_touch_tracking_data_for_moved_touches": true,
+  "tests/test_tracking_touches.py::test_touch_tracking_data_for_new_touches": true,
+  "tests/test_tracking_touches.py::test_touch_tracking_data_for_not_found_in_this_frame": true,
+  "tests/test_tracking_touches.py::test_touch_tracking_data_for_not_moved_touches": true,
+  "tests/test_tracking_touches.py::test_touch_tracking_data_update": true,
+  "tests/test_tracking_touches_integration.py::test_touch_tracking_data_for_missing_touches": true,
+  "tests/test_tracking_touches_integration.py::test_touch_tracking_data_for_moved_touches": true,
+  "tests/test_tracking_touches_integration.py::test_touch_tracking_data_for_new_touches": true,
+  "tests/test_tracking_touches_integration.py::test_touch_tracking_data_for_not_missing_anymore_touches": true,
+  "tests/test_tracking_touches_integration.py::test_touch_tracking_data_for_not_moved_touches": true
 }

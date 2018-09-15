@@ -1,10 +1,76 @@
 import numpy as np
+from collections import OrderedDict
  
 import cv2 as cv
 from primesense import openni2
 from primesense import _openni2 as c_api
 
-import _const, calibration, helpers
+from luna_touch import _const, calibration, helpers, touch_tracking
+from luna_touch.Touch import Touch
+
+#from timeit import default_timer as timer
+
+
+def start_detection_service( surface_model ):
+    # can also accept the path of the OpenNI dll path
+    openni2.initialize("../lib")  
+
+    dev = helpers.open_kinect_device()
+
+    depth_stream = dev.create_depth_stream()
+    depth_stream.start()
+    depth_stream.set_video_mode(c_api.OniVideoMode(pixelFormat = c_api.OniPixelFormat.ONI_PIXEL_FORMAT_DEPTH_1_MM, resolutionX = 640, resolutionY = 480, fps = 30))
+
+    previous_frame_touches = OrderedDict()
+    current_frame_touches = OrderedDict() 
+
+    #repeat for every frame
+    while True :
+        #start = timer()
+        previous_frame_touches = touch_tracking.not_ended_touches( current_frame_touches )
+
+        depth_frame = depth_stream.read_frame()
+        depth_image = helpers.raw_depth_frame_to_img( depth_frame )
+
+        min_threshold = ( surface_model["min_touch_distance"], surface_model["min_touch_distance"], surface_model["min_touch_distance"] )
+        max_threshold = ( surface_model["max_touch_distance"], surface_model["max_touch_distance"], surface_model["max_touch_distance"] )
+        
+        blurred_img = cv.medianBlur(depth_image,5)
+
+        #return an image with the objects inside the touching area
+        thresholded_image = cv.inRange(blurred_img, min_threshold , max_threshold)
+
+        filtered_img = helpers.morph_opening( thresholded_image, _const.DEPTH_OPENING_KERNEL_SIZE )
+
+        detected_touches = raw_touches(thresholded_image, touch_area_limits = surface_model["touch_area_limits"])
+
+        #if(len(detected_touches) > 0):
+        #    print(detected_touches)
+        #else:
+        #    print("no touch")
+    
+        current_frame_touches = touch_tracking.track_touches_changes( previous_frame_touches, detected_touches )
+
+        ############## DISPLAY ###########
+        color_img = cv.cvtColor(filtered_img, cv.COLOR_GRAY2BGR )
+
+        for index, touch in current_frame_touches.items():
+            color_img = cv.circle(color_img, touch.position , touch.radius , (0,255,0), 2)
+            color_img = cv.putText(color_img, str(touch.id) , (touch.position[0] - 10, touch.position[1] - 10), cv.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
+        
+        color_img = cv.drawContours(color_img, [surface_model["touch_area_limits"]], 0, (0,0, 255), 3)
+
+
+        cv.imshow("threshold", color_img)
+        cv.waitKey(34)
+
+        #end = timer()
+        #print(end - start)
+
+
+    depth_stream.stop()
+    openni2.unload()
+
 
 def raw_touches( thresholded_image, touch_area_limits ):
 
@@ -86,64 +152,14 @@ def filter_countous_by_size( contours_in_screen ):
 
         if  contour_area >= _const.MIN_TOUCH_CONTOUR_AREA and contour_area < _const.MAX_TOUCH_CONTOUR_AREA :
 
-             raw_touches.append(contours_in_screen[i])
-        
-        else:
-            print("toobig")
-
+             raw_touches.append( Touch(center_of_mass = contours_in_screen[i]["center_of_mass"], area = contours_in_screen[i]["area"]) )
 
     return raw_touches
 
-#==========================Calibration======================
 
-surface_model = calibration.get_surface_information()
+def not_ended_touches( current_frame_touches ):
 
-#=======================Detection==============================
+    not_ended_touches = [ touch for touch in current_frame_touches if touch.state != _const.TOUCH_STATE_ENDED  ]
 
-# can also accept the path of the OpenNI dll path
-openni2.initialize("../lib")  
-
-dev = openni2.Device.open_any()
-
-depth_stream = dev.create_depth_stream()
-depth_stream.start()
-depth_stream.set_video_mode(c_api.OniVideoMode(pixelFormat = c_api.OniPixelFormat.ONI_PIXEL_FORMAT_DEPTH_1_MM, resolutionX = 640, resolutionY = 480, fps = 30))
-
-
-detector = cv.SimpleBlobDetector()
-
-while True :
-
-    depth_frame = depth_stream.read_frame()
-    depth_image = helpers.raw_depth_frame_to_img( depth_frame )
-
-    min_threshold = ( surface_model["min_touch_distance"], surface_model["min_touch_distance"], surface_model["min_touch_distance"] )
-    max_threshold = ( surface_model["max_touch_distance"], surface_model["max_touch_distance"], surface_model["max_touch_distance"] )
-    
-    
-    #return an image with the objects inside the touching area
-    thresholded_image = cv.inRange(depth_image, min_threshold , max_threshold)
-
-    filtered_img = helpers.morph_opening( thresholded_image, _const.DEPTH_OPENING_KERNEL_SIZE )
-
-    touches = raw_touches(thresholded_image, touch_area_limits = surface_model["touch_area_limits"])
-
-    if(len(touches) > 0):
-        print(touches)
-
-    ############## DISPLAY ###########
-    color_img = cv.cvtColor(filtered_img, cv.COLOR_GRAY2BGR )
-    for touch in touches:
-        color_img = cv.circle(color_img, tuple(map(int, touch["center_of_mass"])), int(helpers.get_circle_radius( area = touch["area"] )) , (0,0,255), 2)
-    
-    color_img = cv.drawContours(color_img, [surface_model["touch_area_limits"]], 0, (0,0, 255), 3)
-
-
-    cv.imshow("threshold", color_img)
-    cv.waitKey(34)
-
-
-depth_stream.stop()
-openni2.unload()
-
+    return not_ended_touches
 

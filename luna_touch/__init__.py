@@ -4,3 +4,5 @@
 
 from . import calibration
 from . import _const
+from . import helpers
+from . import Touch

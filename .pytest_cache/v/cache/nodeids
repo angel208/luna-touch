@@ -1,1 +1,13 @@
-[]
+[
+  "tests/test_find_closest_distance_btw_points.py::test_not_ended_touches",
+  "tests/test_find_closest_distance_btw_points.py::test_get_next_available_id",
+  "tests/test_find_closest_distance_btw_points.py::test_find_closest_distance_btw_points",
+  "tests/tracking_integration_tests/test_missing_touches.py::test_touch_tracking_for_missing_touches",
+  "tests/tracking_integration_tests/test_moved_touches.py::test_touch_tracking_for_moved_touches",
+  "tests/tracking_integration_tests/test_new_touches.py::test_touch_tracking_for_new_touches",
+  "tests/tracking_integration_tests/test_not_found_in_this_frame.py::test_touch_tracking_for_not_found_in_this_frame",
+  "tests/tracking_integration_tests/test_not_missing_anymore.py::test_touch_tracking_for_not_missing_anymore",
+  "tests/tracking_integration_tests/test_not_missing_anymore_touches.py::test_touch_tracking_for_not_missing_anymore_touches",
+  "tests/tracking_integration_tests/test_not_moved_touches.py::test_touch_tracking_for_not_moved_touches",
+  "tests/tracking_integration_tests/test_touch_tracking_data_for_not_missing_anymore_touches.py::test_touch_tracking_for_not_missing_anymore_touches"
+]

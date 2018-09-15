@@ -9,6 +9,9 @@ opencv-python = "*"
 primesense = "*"
 pytest = "*"
 flask = "*"
+mttkinter = "*"
+pillow = "*"
+scipy = "*"
 
 [dev-packages]
 pylint = "*"

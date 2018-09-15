@@ -1,7 +1,12 @@
 import numpy as np
 import cv2 as cv
+import time
 
-import _const
+from primesense import utils
+from primesense import openni2
+
+from luna_touch import _const
+
 
 def raw_depth_frame_to_img( frame ):
 
@@ -45,3 +50,18 @@ def get_circle_radius( area ):
     radius = np.sqrt( area / np.pi )
     
     return radius
+
+def timestamp_in_milliseconds():
+   return int(round(time.time() * 1000))
+
+def open_kinect_device():
+    print("Buscando Dispositivo Kinect...")
+
+    while True:
+        try:
+            device = openni2.Device.open_any()
+            break
+        except utils.OpenNIError:
+            print("no")
+
+    return device
