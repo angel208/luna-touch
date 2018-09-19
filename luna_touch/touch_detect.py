@@ -8,10 +8,10 @@ from primesense import _openni2 as c_api
 from luna_touch import _const, calibration, helpers, touch_tracking
 from luna_touch.Touch import Touch
 
-#from timeit import default_timer as timer
+from timeit import default_timer as timer
 
 
-def start_detection_service( surface_model ):
+def start_detection_service( surface_model, event_queue ):
     # can also accept the path of the OpenNI dll path
     openni2.initialize("../lib")  
 
@@ -26,7 +26,7 @@ def start_detection_service( surface_model ):
 
     #repeat for every frame
     while True :
-        #start = timer()
+        start = timer()
         previous_frame_touches = touch_tracking.not_ended_touches( current_frame_touches )
 
         depth_frame = depth_stream.read_frame()
@@ -51,6 +51,8 @@ def start_detection_service( surface_model ):
     
         current_frame_touches = touch_tracking.track_touches_changes( previous_frame_touches, detected_touches )
 
+        enqueue( event_queue , event = current_frame_touches)
+
         ############## DISPLAY ###########
         color_img = cv.cvtColor(filtered_img, cv.COLOR_GRAY2BGR )
 
@@ -64,13 +66,26 @@ def start_detection_service( surface_model ):
         cv.imshow("threshold", color_img)
         cv.waitKey(34)
 
-        #end = timer()
+        end = timer()
         #print(end - start)
 
 
     depth_stream.stop()
     openni2.unload()
 
+def enqueue( event_queue , event ):
+
+    if event_queue.full() == True:
+        try:
+            event_queue.get_nowait()
+        except Exception:
+            pass
+
+    try:
+        event_queue.put_nowait( event )
+    except Exception:
+        print("ASdasdasdasd")
+        pass
 
 def raw_touches( thresholded_image, touch_area_limits ):
 

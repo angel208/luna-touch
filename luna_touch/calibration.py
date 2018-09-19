@@ -42,6 +42,7 @@ def run_calibration_process():
         if(not q.empty()):
             surface_information = q.get_nowait()
             print(surface_information)
+            root.destroy()
             return surface_information
             break
 
@@ -73,7 +74,7 @@ def get_surface_information():
 def get_surface_area_limits():
     # can also accept the path of the OpenNI redistribution
     openni2.initialize("lib")     
-    dev = helpers.open_kinect_device()
+    dev = openni2.Device.open_any() 
     color_stream = dev.create_color_stream()
     color_stream.start()
     color_stream.set_video_mode(c_api.OniVideoMode(pixelFormat = c_api.OniPixelFormat.ONI_PIXEL_FORMAT_RGB888, resolutionX = 640, resolutionY = 480, fps = 30))

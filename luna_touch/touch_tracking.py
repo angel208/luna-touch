@@ -37,7 +37,6 @@ def mark_all_touches_as_missed(previous_frame_touches):
     
     for index, touch in previous_frame_touches.items():
 
-        print(touch)
         
         if(touch.frames_missing <= _const.TOUCH_TRACKING_MAX_MISSED_FRAMES):
         
@@ -49,8 +48,6 @@ def mark_all_touches_as_missed(previous_frame_touches):
             updated_touches[touch.id].state = _const.TOUCH_STATE_ENDED
             updated_touches[touch.id].frames_missing = 0
 
-    print("updated_touches")
-    print(updated_touches)
     return updated_touches
 
     
@@ -66,7 +63,6 @@ def track_touches_changes( previous_frame_touches, current_frame_touches ):
         return mark_all_touches_as_missed(previous_frame_touches)
 
     touches_changes = find_min_distance_btw_points( previous_frame_touches, current_frame_touches )
-    print(touches_changes)
 
     updated_touches = previous_frame_touches
 
@@ -88,28 +84,24 @@ def track_touches_changes( previous_frame_touches, current_frame_touches ):
 
         elif detected_touch['curr_pos'] == None:
             if(previous_frame_touches[prev_touch_id].frames_missing <= _const.TOUCH_TRACKING_MAX_MISSED_FRAMES):
-                print("lossed touch" + str(detected_touch['prev_pos']))
                 updated_touches[prev_touch_id].state = _const.TOUCH_STATE_MISSED
                 updated_touches[prev_touch_id].frames_missing += 1
             else:
-                print("ended touch" + str(detected_touch['prev_pos']))
                 updated_touches[prev_touch_id].state = _const.TOUCH_STATE_ENDED
                 updated_touches[prev_touch_id].frames_missing = 0
 
         elif detected_touch['prev_pos'] == detected_touch['curr_pos']:
-            print("unmoved touch" + str(detected_touch['prev_pos']))
             updated_touches[prev_touch_id].state = _const.TOUCH_STATE_STILL
             updated_touches[prev_touch_id].frames_missing = 0
 
         elif detected_touch['prev_pos'] != detected_touch['curr_pos']:
 
-            if detected_touch['distance'] <= _const.TOUCH_TRACKING_MAX_RATIO:
-                print("moved touch" + str(detected_touch['curr_pos']))
-                updated_touches[prev_touch_id].state = _const.TOUCH_STATE_MOVED
-                updated_touches[prev_touch_id].frames_missing = 0
-                updated_touches[prev_touch_id].position = detected_touch['curr_pos']
-                #falta delta time, delta pos y area
-            else:
+            #if detected_touch['distance'] <= _const.TOUCH_TRACKING_MAX_RATIO:
+            updated_touches[prev_touch_id].state = _const.TOUCH_STATE_MOVED
+            updated_touches[prev_touch_id].frames_missing = 0
+            updated_touches[prev_touch_id].position = detected_touch['curr_pos']
+            #falta delta time, delta pos y area
+            '''else:
                 #previous touch goes missing
                 updated_touches[prev_touch_id].state = _const.TOUCH_STATE_MISSED
                 updated_touches[prev_touch_id].frames_missing += 1
@@ -117,7 +109,7 @@ def track_touches_changes( previous_frame_touches, current_frame_touches ):
                 #current touch is a new touch
                 next_available_id = get_next_available_id( updated_touches )
                 updated_touches[next_available_id] = Touch( detected_touch['curr_pos'] , _const.DEFAULT_TOUCH_AREA)
-
+            '''
 
     
     return updated_touches
@@ -204,41 +196,6 @@ def get_next_available_id( touch_list ):
 
     return new_index_at_end_of_list
 
-previous_frame_touches=OrderedDict()
-
-previous_frame_touches[0] = Touch((1,1), 30)
-previous_frame_touches[1] = Touch((20,20), 20)
-previous_frame_touches[2] = Touch((50,50), 67)
-previous_frame_touches[3] = Touch((200,200), 30)
-
-
-previous_frame_touches[0].id = 0
-previous_frame_touches[1].id = 1
-previous_frame_touches[2].id = 2
-previous_frame_touches[3].id = 3
-
-previous_frame_touches[0].state = _const.TOUCH_STATE_MISSED
-previous_frame_touches[1].state = _const.TOUCH_STATE_MISSED
-previous_frame_touches[2].state = _const.TOUCH_STATE_MISSED
-previous_frame_touches[3].state = _const.TOUCH_STATE_MISSED
-
-previous_frame_touches[0].frames_missing = 1
-previous_frame_touches[1].frames_missing = 2
-previous_frame_touches[2].frames_missing = 0
-previous_frame_touches[3].frames_missing = 5
-
-
-
-current_frame_touches = [
-                    Touch((3,3), 20),
-                    Touch((20,20), 67),
-                    Touch((2,2), 30)                    
-               ]                    
-
-
-td = track_touches_changes(previous_frame_touches, current_frame_touches)
-
-print(td)
 
 
 
