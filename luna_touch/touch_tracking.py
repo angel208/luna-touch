@@ -127,8 +127,6 @@ def not_ended_touches( current_frame_touches ):
 
 def find_min_distance_btw_points( previous_frame_touches, current_frame_touches ):
 
-
-    
     prev_points_position = [ touch.position for touch in get_list_from_dictionary(previous_frame_touches)]
     curr_points_position = [ touch.position for touch in current_frame_touches ]
 

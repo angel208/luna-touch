@@ -1,6 +1,7 @@
 import numpy as np
 from collections import OrderedDict
- 
+import copy
+
 import cv2 as cv
 from primesense import openni2
 from primesense import _openni2 as c_api
@@ -24,6 +25,11 @@ def start_detection_service( surface_model, event_queue ):
     previous_frame_touches = OrderedDict()
     current_frame_touches = OrderedDict() 
 
+    #this transform matrix will be used in the process of mapping the touches to screen coordinates
+    #screen_resolution = helpers.get_display_resolution()
+    screen_resolution = ( 1366, 768)
+    transform_matrix = get_transform_matrix( surface_model['touch_area_limits'], screen_resolution[0], screen_resolution[1])
+
     #repeat for every frame
     while True :
         start = timer()
@@ -44,24 +50,25 @@ def start_detection_service( surface_model, event_queue ):
 
         detected_touches = raw_touches(thresholded_image, touch_area_limits = surface_model["touch_area_limits"])
 
-        #if(len(detected_touches) > 0):
-        #    print(detected_touches)
-        #else:
-        #    print("no touch")
     
         current_frame_touches = touch_tracking.track_touches_changes( previous_frame_touches, detected_touches )
-
-        enqueue( event_queue , event = current_frame_touches)
-
+        
         ############## DISPLAY ###########
         color_img = cv.cvtColor(filtered_img, cv.COLOR_GRAY2BGR )
 
         for index, touch in current_frame_touches.items():
+            
             color_img = cv.circle(color_img, touch.position , touch.radius , (0,255,0), 2)
             color_img = cv.putText(color_img, str(touch.id) , (touch.position[0] - 10, touch.position[1] - 10), cv.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
         
         color_img = cv.drawContours(color_img, [surface_model["touch_area_limits"]], 0, (0,0, 255), 3)
+        ###################################################
 
+
+        maped_touches = map_touches_to_screen_coordinates(current_frame_touches.copy(), transform_matrix)
+        print(maped_touches.values())
+
+        enqueue( event_queue , event = maped_touches)
 
         cv.imshow("threshold", color_img)
         cv.waitKey(34)
@@ -72,6 +79,17 @@ def start_detection_service( surface_model, event_queue ):
 
     depth_stream.stop()
     openni2.unload()
+
+def map_touches_to_screen_coordinates(current_frame_touches, transform_matrix):
+
+    maped_touches = OrderedDict()
+
+    for key, touch in current_frame_touches.items():
+        maped_touches[key] = copy.copy(touch)
+        maped_touches[key].position =  map_touch_position_to_screen_coordinate( touch.position , transform_matrix )
+
+    return maped_touches
+
 
 def enqueue( event_queue , event ):
 
@@ -84,7 +102,6 @@ def enqueue( event_queue , event ):
     try:
         event_queue.put_nowait( event )
     except Exception:
-        print("ASdasdasdasd")
         pass
 
 def raw_touches( thresholded_image, touch_area_limits ):
@@ -177,4 +194,68 @@ def not_ended_touches( current_frame_touches ):
     not_ended_touches = [ touch for touch in current_frame_touches if touch.state != _const.TOUCH_STATE_ENDED  ]
 
     return not_ended_touches
+
+
+# the list of points will be ordered
+# such that the first entry in the list is the bottom-left,
+# the second entry is the bottom-right, the third is the
+# top-right, and the fourth is the top-left
+def order_rect_points(pts):
+    
+    rect = np.zeros((4, 2), dtype = "float32")
+ 
+    # the top-left point will have the smallest sum, whereas
+    # the bottom-right point will have the largest sum
+    s = pts.sum(axis = 1)
+    rect[3] = pts[np.argmin(s)]
+    rect[1] = pts[np.argmax(s)]
+ 
+    # now, compute the difference between the points, the
+    # top-right point will have the smallest difference,
+    # whereas the bottom-left will have the largest difference
+    diff = np.diff(pts, axis = 1)
+    rect[2    ] = pts[np.argmin(diff)]
+    rect[0] = pts[np.argmax(diff)]
+ 
+    # return the ordered coordinates
+    return rect
+
+def get_transform_matrix(original_points, resolution_max_width, resolution_max_heigth):
+    
+    ordered_original_rectangle = order_rect_points(original_points)
+    ( bl, br, tr, tl) = ordered_original_rectangle
+ 
+    final_map_width = resolution_max_width
+    final_map_heigth = resolution_max_heigth
+    
+    destination_matrix = np.array([
+        [0, 0],
+        [final_map_width - 1, 0],
+        [final_map_width - 1, final_map_heigth - 1],
+        [0, final_map_heigth - 1]], dtype = "float32")
+ 
+    transform_matrix = cv.getPerspectiveTransform( ordered_original_rectangle, destination_matrix )
+
+    return transform_matrix
+
+
+def map_touch_position_to_screen_coordinate( touch_position , transform_matrix ):
+
+    point =  np.array([[list(touch_position)]], dtype=np.float32)
+
+
+    #print(point)
+
+    maped_point = cv.perspectiveTransform( src = point , m = transform_matrix);
+    #print(maped_point)
+    result_point = list(map(int,maped_point[0][0]))
+
+    if result_point[0] < 0:
+        result_point[0] = 0 
+    elif result_point[1] < 0:
+        result_point[1] = 0 
+
+    #print(result_point)
+
+    return  tuple(result_point)
 

@@ -129,7 +129,7 @@ def get_surface_area_limits():
 
 def get_surface_distance( touch_area_limits ):
 
-    return 718
+    return 726
 
     # can also accept the path of the OpenNI redistribution
     openni2.initialize("../lib")     

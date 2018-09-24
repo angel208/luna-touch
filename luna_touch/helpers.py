@@ -1,6 +1,7 @@
 import numpy as np
 import cv2 as cv
 import time
+import ctypes
 
 from primesense import utils
 from primesense import openni2
@@ -65,3 +66,8 @@ def open_kinect_device():
             print("no")
 
     return device
+
+def get_display_resolution():
+    user32 = ctypes.windll.user32
+    screensize = user32.GetSystemMetrics(0), user32.GetSystemMetrics(1)
+    return screensize
