@@ -12,6 +12,8 @@
 *.vscode
 Pifile
 
+node_modules/
+
 # ocamlbuild working directory
 _build/
 
