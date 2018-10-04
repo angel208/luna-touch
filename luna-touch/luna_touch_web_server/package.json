@@ -1,0 +1,27 @@
+{
+  "name": "luna-touch-web-server",
+  "version": "1.0.0",
+  "description": "express web server that consumes the luna touch service made in python",
+  "main": "luna_touch_web_server.js",
+  "directories": {
+    "lib": "lib",
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/angel208/luna-touch.git"
+  },
+  "author": "angel peña",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/angel208/luna-touch/issues"
+  },
+  "homepage": "https://github.com/angel208/luna-touch#readme",
+  "dependencies": {
+    "express": "^4.16.3",
+    "redis": "^2.8.0"
+  }
+}

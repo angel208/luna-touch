@@ -1,6 +1,0 @@
-[
-  "test_calibration_distance.py::test_distance_calculation_from_calibration_frame[calibration_frame0-1097]",
-  "test_calibration_distance.py::test_distance_calculation_from_calibration_frame[calibration_frame1-1097]",
-  "test_calibration_distance.py::test_distance_calculation_from_calibration_frame[calibration_frame2-1114]",
-  "test_calibration_distance.py::test_distance_calculation_from_calibration_frame[calibration_frame3-1133]"
-]

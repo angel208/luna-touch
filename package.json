@@ -1,0 +1,23 @@
+{
+  "name": "luna-platform",
+  "version": "1.0.0",
+  "description": "General and easy to use multi touch surface platform using Kinect v1.0 and OpenNI 2.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/angel208/luna-touch.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/angel208/luna-touch/issues"
+  },
+  "homepage": "https://github.com/angel208/luna-touch#readme",
+  "dependencies": {
+    "axios": "^0.18.0",
+    "express": "^4.16.3"
+  }
+}
