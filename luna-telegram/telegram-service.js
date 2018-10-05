@@ -12,7 +12,7 @@ var validation = require('./validation/SendTGMessage.js');
 var bodyParser = require('body-parser')
 app.use(bodyParser.json())
 
-/* TODO 
+/* TODO  id:182
 
 fill the help message
 create strings file
