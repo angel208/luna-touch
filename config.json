@@ -1,0 +1,7 @@
+{
+    "port": 5000,
+    "telegram_enabled": true,
+    "touch_enabled": false,
+    "t2s_enabled":true,
+    "storage_enabled":false
+}

@@ -18,6 +18,7 @@
   "homepage": "https://github.com/angel208/luna-touch#readme",
   "dependencies": {
     "axios": "^0.18.0",
-    "express": "^4.16.3"
+    "express": "^4.16.3",
+    "express-validation": "^1.0.2"
   }
 }

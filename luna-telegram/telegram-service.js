@@ -12,15 +12,13 @@ var validation = require('./validation/SendTGMessage.js');
 var bodyParser = require('body-parser')
 app.use(bodyParser.json())
 
-/* TODO 
+//TODO fill help message
+//TODO define negtive regexp (all but start and help)
+//FIXME only accept /start and not start
+//TODO case insensitive
+//TODO check conection to internet
 
-fill the help message
-create strings file
 
-make help and start regexp case insensitive
-define the negative regexp (anything but help and start)
-
-*/
 
 
 const TelegramBot = require('node-telegram-bot-api');

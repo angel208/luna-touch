@@ -9,6 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "electron": "^3.0.2",
     "express.js": "^1.0.0"
   }
 }
