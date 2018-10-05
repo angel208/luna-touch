@@ -2,14 +2,18 @@
   "name": "luna-gui",
   "version": "1.0.0",
   "description": "this is the main interface for the luna system",
-  "main": "index.js",
+  "main": "luna-gui.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "electron ."
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "electron": "^3.0.2",
     "express.js": "^1.0.0"
+  },
+  "devDependencies": {
+    "electron-reload": "^1.2.5"
   }
 }

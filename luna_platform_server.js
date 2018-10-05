@@ -3,6 +3,8 @@ const spawn = require("child_process").spawn;
 const express = require('express')
 const app = express()
 var axios = require('axios')
+
+path = require('path')
 var bodyParser = require('body-parser')
 app.use(bodyParser.json())
 
@@ -12,18 +14,22 @@ var port = config.port
 //---- Starting up services ---
 //TODO restart the service if the service needs to be up
 //TODO enable/disable services withour restart (not a priority)
+//TODO englobe all configurations
 
 var t2s_service = null
 var telegram_service = null 
 var storage_service = null
 var touch_service = null;
 
+console.log( path.join(__dirname,"text-2-speech-service.js") )
+
 console.log("Starting services...")
 
 if (config.touch_enabled){
 
     console.log("Starting touch services...")
-    touch_service = spawn('node',["./luna-touch/luna_touch_service.py"]);
+    
+    touch_service = spawn('node',[ path.join(__dirname, "./luna-touch/luna_touch_service.py")]);
 
     touch_service.on('exit', function (code, signal) {
         console.log('Touch service exited with ' + `code ${code} and signal ${signal}`);
@@ -38,7 +44,7 @@ if (config.touch_enabled){
 if (config.t2s_enabled){
 
     console.log("Starting text to speech services...")
-    t2s_service = spawn('node',["./luna-text-2-speech/text-2-speech-service.js"]);
+    t2s_service = spawn('node',[ path.join(__dirname,"./luna-text-2-speech/text-2-speech-service.js")] )  ;
 
     t2s_service.on('exit', function (code, signal) {
         console.log('Text to speech service exited with ' + `code ${code} and signal ${signal}`);
@@ -52,7 +58,7 @@ if (config.t2s_enabled){
 if (config.telegram_enabled){
 
     console.log("Starting telegram services...")
-    telegram_service = spawn('node',["./luna-telegram/telegram-service.js"]);
+    telegram_service = spawn('node',[path.join(__dirname,"./luna-telegram/telegram-service.js")]);
     
     telegram_service.on('exit', function (code, signal) {
         console.log('Telegram service exited with ' + `code ${code} and signal ${signal}`);
@@ -67,7 +73,7 @@ if (config.telegram_enabled){
 if (config.storage_enabled){
 
     console.log("Starting storage services...")
-    storage_service = spawn('node',["./luna-storage/storage-service.js"]);
+    storage_service = spawn('node',[path.join(__dirname,"./luna-storage/storage-service.js")]);
     
     storage_service.on('exit', function (code, signal) {
         console.log('Storage service exited with ' + `code ${code} and signal ${signal}`);
@@ -105,5 +111,15 @@ process.on('cleanup', function(){
 });
 
 //------- Server Start ------------
+
+
+app.get('/hola', (req, res) => {
+
+    
+    res.status(200).send("hola")
+
+
+})
+
 app.listen(port, () => console.log(`Luna Platform is listening on port ${port}!`))
  
