@@ -12,6 +12,6 @@ imdone-help
 #HELP: Add metadata like this... +imdone-help points:5 id:92
 - [imdone.io](https://imdone.io) adds `id:n` to all your todo comments, so take care to leave that one alone
 
-#HELP: Include subtasks using GFM task lists +imdone-help id:1
+#DONE: Include subtasks using GFM task lists +imdone-help id:1
 - [ ] A task yet to be done
 - [x] This is done
