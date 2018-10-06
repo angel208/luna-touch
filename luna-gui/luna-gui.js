@@ -2,6 +2,8 @@ const { app, BrowserWindow } = require('electron')
 const path = require('path')
 const spawn = require("child_process").spawn
 
+const fs = require('fs');
+
 //only for dev purposes!!
 require('electron-reload')(__dirname);
 /*require('electron-reload')(__dirname, {
@@ -12,24 +14,28 @@ require('electron-reload')(__dirname);
   
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
-let win 
+
+let apps_window 
 var luna_service
 
 function createWindow () {
 
-    win = new BrowserWindow({ width: 800, height: 600 })
+    apps_window = new BrowserWindow({ width: 800, height: 600 })
 
-    win.loadFile('index.html')
+    apps_window.loadFile('index.html')
 
     // Open the DevTools.
-    win.webContents.openDevTools() 
+    apps_window.webContents.openDevTools() 
 
     // Emitted when the window is closed.
-    win.on('closed', () => {
+    apps_window.on('closed', () => {
         if( luna_service ) luna_service.kill('SIGINT')
-        win = null
+        apps_window = null
     })
+  
 }
+
+exports.apps_window = apps_window;
 
 //------------ LIFECICLE -------------
 
@@ -58,7 +64,7 @@ app.on('window-all-closed', () => {
 
 //only for mac
 app.on('activate', () => {
-    if (win === null) {
+    if (apps_window === null) {
         createWindow()
     }
 })
