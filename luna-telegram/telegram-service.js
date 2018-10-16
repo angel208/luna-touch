@@ -68,7 +68,7 @@ app.post('/message', validate(validation), (req, res) => {
 
         // send the message to the chat
         bot.sendMessage( config.chat_id , message );
-        res.status(200).send("success!")
+        res.status(201).send(message)
 
     }
     else{

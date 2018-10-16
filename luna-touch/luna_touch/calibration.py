@@ -58,7 +58,7 @@ def request_surface_information( surface_information_queue ):
 
 def get_surface_information():
 
-    touch_area_limits = get_surface_area_limits()
+    touch_area_limits = np.array(order_rect_points2(get_surface_area_limits()))
     print(touch_area_limits)
     surface_distance = get_surface_distance(touch_area_limits)
     print(surface_distance)
@@ -70,6 +70,52 @@ def get_surface_information():
                  }
 
     return touch_area
+
+# the list of points will be ordered
+# such that the first entry in the list is the bottom-left,
+# the second entry is the bottom-right, the third is the
+# top-right, and the fourth is the top-left
+def order_rect_points2(pts):
+    print("casl")
+    print(pts)
+
+    rect = np.zeros((4, 2), dtype = "float32")
+ 
+    # the top-left point will have the smallest sum, whereas
+    # the bottom-right point will have the largest sum
+    s = pts.sum(axis = 1)
+    rect[3] = pts[np.argmin(s)] #top left
+    rect[1] = pts[np.argmax(s)] #bottom_rigth
+ 
+    # now, compute the difference between the points, the
+    # top-right point will have the smallest difference,
+    # whereas the bottom-left will have the largest difference
+    diff = np.diff(pts, axis = 1)
+    rect[2] = list(map( int, pts[np.argmin(diff)] ))#top right
+    rect[0] = pts[np.argmax(diff)] #bottom left
+ 
+    # return the ordered coordinates
+    '''return list(
+                    map(list,
+                        [
+                            [ int(rect[0][0] - 55), int(rect[0][1])],
+                            list(map(int,rect[1])), 
+                            list(map(int,rect[2])),
+                            [int(rect[3][0] - 55), int(rect[3][1])] 
+                        ]
+                    )
+                )'''
+                
+    return list(
+                    map(list,
+                        [
+                            [ int(rect[0][0] - 40), int(rect[0][1] )],
+                            [ int(rect[1][0] ), int(rect[1][1])], 
+                            [ int(rect[2][0]  ), int(rect[2][1] - 40 )],
+                            [int(rect[3][0] - 40), int(rect[3][1] - 40)] 
+                        ]
+                    )
+                )
 
 def get_surface_area_limits():
     # can also accept the path of the OpenNI redistribution
@@ -92,7 +138,7 @@ def get_surface_area_limits():
 
         thresholded_img = cv.inRange(blurred,  _const.MIN_THRESH_WHITE , _const.MAX_THRESH_WHITE )
 
-        filtered_img = helpers.morph_opening( thresholded_img, _const.OPENING_KERNEL_SIZE  )
+        filtered_img = helpers.morph_opening( thresholded_img )
 
         _ , contours, _ = cv.findContours( filtered_img, cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE)
 
@@ -129,8 +175,9 @@ def get_surface_area_limits():
 
 def get_surface_distance( touch_area_limits ):
 
-    return 704
-
+    #return 652
+    return 720
+    
     # can also accept the path of the OpenNI redistribution
     openni2.initialize("../lib")     
 

@@ -46,7 +46,7 @@ def start_detection_service( surface_model, event_queue ):
 
         thresholded_image = cv.inRange(blurred_img, min_threshold , max_threshold)
 
-        filtered_img = helpers.morph_opening( thresholded_image, _const.DEPTH_OPENING_KERNEL_SIZE )
+        filtered_img = helpers.morph_opening( thresholded_image )
 
         detected_touches = raw_touches(thresholded_image, touch_area_limits = surface_model["touch_area_limits"])
 
@@ -207,6 +207,9 @@ def not_ended_touches( current_frame_touches ):
 # the second entry is the bottom-right, the third is the
 # top-right, and the fourth is the top-left
 def order_rect_points(pts):
+
+    print("ords")
+    print(type(pts))
     
     rect = np.zeros((4, 2), dtype = "float32")
  
@@ -235,10 +238,11 @@ def get_transform_matrix(original_points, resolution_max_width, resolution_max_h
     final_map_heigth = resolution_max_heigth
     
     destination_matrix = np.array([
-        [0, 0],
         [final_map_width - 1, 0],
-        [final_map_width - 1, final_map_heigth - 1],
-        [0, final_map_heigth - 1]], dtype = "float32")
+        [0, 0],
+        [0, final_map_heigth - 1],
+        [final_map_width - 1, final_map_heigth - 1]],
+         dtype = "float32")
  
     transform_matrix = cv.getPerspectiveTransform( ordered_original_rectangle, destination_matrix )
 

@@ -1,6 +1,7 @@
 const { app, BrowserWindow } = require('electron')
 const path = require('path')
 const spawn = require("child_process").spawn
+const ipcMain = require('electron').ipcMain;
 
 const fs = require('fs');
 
@@ -11,6 +12,7 @@ require('electron-reload')(__dirname);
   });*/
 
  //TODO adding some way to know if the process started successfully
+ //TODO block if clicked once
   
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -68,5 +70,13 @@ app.on('activate', () => {
         createWindow()
     }
 })
+
+//------------------- IPC -------------------------
+
+// in main process, outside of app.on:
+ipcMain.on('load-page', (event, arg) => {
+    console.log("asd")
+    apps_window.loadFile(arg);
+});
 
 //------------------------------------------------

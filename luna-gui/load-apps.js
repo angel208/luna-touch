@@ -1,3 +1,5 @@
+const ipc = require('electron').ipcRenderer;
+
 const fs = require('fs');
 const path = require('path');
 
@@ -22,13 +24,16 @@ fs.readdir(appFolder, (err, app_folders) => {
 
     let app_exec_path = path.join( app_root_dir, String(app_exec))
 
+
     if ( app_exec != undefined ){
 
         $("#app-list").append(
-            $('<li>').append(
-                $('<button>').attr('class', 'app').attr('type', 'button').attr('value', app_exec_path).append(
-                    $('<span>').attr('class', 'tab').append(app_folder)
-        )))
+            $('<div>').attr('class', 'card').append(
+                $('<button>').attr('class', 'app').attr('value', app_exec_path).append(
+                    $('<div>').attr('class', 'card-image').append(
+                        $('<img>').attr('src', './icons/Luna Simple Piano.jpg')
+        ))))
+
 
     }
 
@@ -36,13 +41,19 @@ fs.readdir(appFolder, (err, app_folders) => {
 
 })
 
+$(document).on( 'click', '#back-btn', function(e){
+
+    e.preventDefault(); 
+    console.log("asd")
+    ipc.send('load-page', './index.html');
+
+})
+
 
 $(document).on( 'click', '.app', function(e){
 
     e.preventDefault(); 
-
     var app = $(this).val()
-
     execute_app( app )
 
     console.log( app )
@@ -50,6 +61,7 @@ $(document).on( 'click', '.app', function(e){
 })
 
 function execute_app( exe ){
+
     console.log("executing: " + exe );
 
     exec( exe , function(err, data) {  
@@ -64,6 +76,18 @@ function get_executable_in_directory( app_dir ){
 
     let app_dir_content = fs.readdirSync( app_dir );
     let file_exec = app_dir_content.filter( function( elm ) {return elm.match(/.*\.exe/ig);})[0];
+
+    return file_exec;
+
+}
+
+function get_icon_in_directory( icon_dir, app_name ){
+
+    let icon_dir_content = fs.readdirSync( icon_dir );
+
+    var re = new RegExp( app_name + ".*", "g");
+
+    let file_exec = icon_dir_content.filter( function( elm ) {return elm.match(re);})[0];
 
     return file_exec;
 

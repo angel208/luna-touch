@@ -41,9 +41,14 @@ def raw_color_frame_to_LAB ( color_frame ):
     img = cv.cvtColor(img, cv.COLOR_RGB2LAB )
     return img
 
-def morph_opening( img , kernel_size ):
-    kernel = np.ones(( kernel_size, kernel_size ),np.uint8)
-    open_img = cv.morphologyEx(img, cv.MORPH_OPEN, kernel)
+def morph_opening( img ):
+
+    erotion_kernel = np.ones(( _const.DEPTH_EROTION_KERNEL_SIZE, _const.DEPTH_EROTION_KERNEL_SIZE ),np.uint8)
+    dilation_kernel = np.ones(( _const.DEPTH_DILATION_KERNEL_SIZE, _const.DEPTH_DILATION_KERNEL_SIZE ),np.uint8)
+
+    eroded_img = cv.erode(img,erotion_kernel,iterations = 1)
+    open_img = cv.dilate(eroded_img,dilation_kernel,iterations = 1)
+ 
     return open_img
 
 def get_circle_radius( area ):
