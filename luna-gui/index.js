@@ -1,4 +1,5 @@
 const ipc = require('electron').ipcRenderer;
+var async = require("async");
 
 
 $(document).on( 'click', '#start-btn', function(e){
@@ -8,3 +9,4 @@ $(document).on( 'click', '#start-btn', function(e){
     ipc.send('load-page', './app-list.html');
 
 })
+

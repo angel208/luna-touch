@@ -1,0 +1,32 @@
+.menu-button{
+    background-color: #323232; /* Blue background */
+    border: none; /* Remove borders */
+    color: white; /* White text */
+    padding: 12px 16px; /* Some padding */
+    font-size: 16px; /* Set a font size */
+    cursor: pointer; /* Mouse pointer on hover */
+    height: 75px;
+    width: 99%;
+    margin-top: 4px;
+}
+
+/* Darker background on mouse-over */
+.menu-button:hover {
+    background-color: #878787;
+}
+
+.btn-image{
+    margin-top: 10%;
+    width: 40px;
+    height: 40px;
+}
+
+.gear-img{
+    background-color:#9D1086;
+    width: 75px;
+    height: 75px;
+    padding: 20px;
+    margin: 10px;
+    margin-left: 10px;
+    margin-left: 13px;
+}

@@ -95,18 +95,18 @@ def order_rect_points2(pts):
     rect[0] = pts[np.argmax(diff)] #bottom left
  
     # return the ordered coordinates
-    '''return list(
+    return list(
                     map(list,
                         [
-                            [ int(rect[0][0] - 55), int(rect[0][1])],
-                            list(map(int,rect[1])), 
-                            list(map(int,rect[2])),
-                            [int(rect[3][0] - 55), int(rect[3][1])] 
+                            [ int(rect[0][0] - 5), int(rect[0][1] )],
+                            [ int(rect[1][0] ) + 10, int(rect[1][1]) - 15] , 
+                            [ int(rect[2][0] ), int(rect[2][1] - 22)],
+                            [int(rect[3][0] - 20), int(rect[3][1])-  15] 
                         ]
                     )
-                )'''
+                )
                 
-    return list(
+    '''return list(
                     map(list,
                         [
                             [ int(rect[0][0] - 40), int(rect[0][1] )],
@@ -115,7 +115,7 @@ def order_rect_points2(pts):
                             [int(rect[3][0] - 40), int(rect[3][1] - 40)] 
                         ]
                     )
-                )
+                )'''
 
 def get_surface_area_limits():
     # can also accept the path of the OpenNI redistribution
@@ -175,8 +175,8 @@ def get_surface_area_limits():
 
 def get_surface_distance( touch_area_limits ):
 
-    #return 652
-    return 720
+    return 650
+    #return 720
     
     # can also accept the path of the OpenNI redistribution
     openni2.initialize("../lib")     

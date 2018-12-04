@@ -5,6 +5,8 @@ import copy
 import cv2 as cv
 from primesense import openni2
 from primesense import _openni2 as c_api
+from scipy.spatial import distance
+import json
 
 from luna_touch import _const, calibration, helpers, touch_tracking
 from luna_touch.Touch import Touch
@@ -22,6 +24,14 @@ def start_detection_service( surface_model, event_queue ):
     depth_stream = dev.create_depth_stream()
     depth_stream.start()
     depth_stream.set_video_mode(c_api.OniVideoMode(pixelFormat = c_api.OniPixelFormat.ONI_PIXEL_FORMAT_DEPTH_1_MM, resolutionX = 640, resolutionY = 480, fps = 30))
+
+    color_stream = dev.create_color_stream()
+    color_stream.start()
+    color_stream.set_video_mode(c_api.OniVideoMode(pixelFormat = c_api.OniPixelFormat.ONI_PIXEL_FORMAT_RGB888, resolutionX = 640, resolutionY = 480, fps = 30))
+
+    with open('bracelets.json') as f:
+        bracelets = json.load(f)
+        print(bracelets)
 
     previous_frame_touches = OrderedDict()
     current_frame_touches = OrderedDict() 
@@ -53,6 +63,11 @@ def start_detection_service( surface_model, event_queue ):
     
         current_frame_touches = touch_tracking.track_touches_changes( previous_frame_touches, detected_touches )
         
+        #color_frame = color_stream.read_frame()
+        #img_bgr = helpers.raw_color_frame_to_BGR( color_frame )
+        #img_hsv = helpers.raw_color_frame_to_HSV( color_frame )
+        #img_bgr = recog_users( bracelets, img_hsv, img_bgr, current_frame_touches )
+
         ############## DISPLAY ###########
         color_img = cv.cvtColor(filtered_img, cv.COLOR_GRAY2BGR )
 
@@ -77,6 +92,7 @@ def start_detection_service( surface_model, event_queue ):
         
         enqueue( event_queue , maped_touches)
 
+       #cv.imshow("color", img_bgr)
         cv.imshow("threshold", color_img)
         cv.waitKey(34)
 
@@ -109,6 +125,63 @@ def enqueue( event_queue , event ):
     print(event)
     event_queue.put( touch )
     
+def recog_users( bracelets, hsv_image, bgr_img, touches):
+
+    for bracelet in bracelets:
+    
+        lower = np.array(bracelet["lower_threshold"])
+        upper = np.array(bracelet["upper_threshold"])
+
+        filtered = cv.inRange(hsv_image, lower , upper)
+        filtered = cv.medianBlur(filtered,5)
+        filtered = helpers.morph_opening( filtered )
+
+        im2, contours, hierarchy = cv.findContours(filtered,cv.RETR_TREE,cv.CHAIN_APPROX_SIMPLE)
+
+        #filter by shape TODO
+        if(len(contours)):
+
+            max_contour = max(contours, key = cv.contourArea)
+
+            M = cv.moments(max_contour)
+
+            if ( M["m00"] > 0):
+                cX = int(M["m10"] / M["m00"])
+                cY = int(M["m01"] / M["m00"])
+                print( "center: " + str(cX) + "," + str(cY))
+                bgr_img = cv.drawContours(bgr_img, max_contour, 0, (255,0,0), 3)
+            else:
+                continue;
+        else:
+            continue;
+
+        bracelet["current_pos"] = [ cX , cY ]
+    
+    #print(bracelets)
+
+    
+    touches_pos = [ list(touch.position) for touch in  list(touches.values()) ]
+    bracelets_pos = [ x["current_pos"] for x in bracelets ]
+
+    if( len(touches_pos) > 0 ):
+
+        print(touches_pos)
+        print(bracelets_pos)
+
+        print("Asd")
+        print(touches)
+
+        # the result of this operation is the index of the first array that are closer to the second = [ 0 0 1 1 1]
+        closest_distance_indexes = np.argmin(distance.cdist(bracelets_pos,touches_pos,'sqeuclidean'),axis=0)
+        
+        for index, touch in list(touches.values()):
+            print(touch)
+            bracelet_index = closest_distance_indexes[index]
+            touch.user = bracelets[bracelet_index]["id"]
+
+        print(touches)
+
+    return bgr_img
 
 def raw_touches( thresholded_image, touch_area_limits ):
 
@@ -208,8 +281,8 @@ def not_ended_touches( current_frame_touches ):
 # top-right, and the fourth is the top-left
 def order_rect_points(pts):
 
-    print("ords")
-    print(type(pts))
+    #print("ords")
+    #print(type(pts))
     
     rect = np.zeros((4, 2), dtype = "float32")
  
@@ -217,13 +290,13 @@ def order_rect_points(pts):
     # the bottom-right point will have the largest sum
     s = pts.sum(axis = 1)
     rect[3] = pts[np.argmin(s)]
-    rect[1] = pts[np.argmax(s)]
+    rect[2] = pts[np.argmax(s)]
  
     # now, compute the difference between the points, the
     # top-right point will have the smallest difference,
     # whereas the bottom-left will have the largest difference
     diff = np.diff(pts, axis = 1)
-    rect[2    ] = pts[np.argmin(diff)]
+    rect[1    ] = pts[np.argmin(diff)]
     rect[0] = pts[np.argmax(diff)]
  
     # return the ordered coordinates
@@ -238,10 +311,13 @@ def get_transform_matrix(original_points, resolution_max_width, resolution_max_h
     final_map_heigth = resolution_max_heigth
     
     destination_matrix = np.array([
-        [final_map_width - 1, 0],
-        [0, 0],
+        
         [0, final_map_heigth - 1],
-        [final_map_width - 1, final_map_heigth - 1]],
+        [final_map_width - 1, 0],
+        [final_map_width - 1, final_map_heigth - 1],
+
+        [0, 0]
+        ],
          dtype = "float32")
  
     transform_matrix = cv.getPerspectiveTransform( ordered_original_rectangle, destination_matrix )

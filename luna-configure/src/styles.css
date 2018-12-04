@@ -1,0 +1,17 @@
+/* You can add global styles to this file, and also import other style files */
+body {
+    height: 100vh;
+}
+
+.main-container{
+    width:100%; margin: 0; max-width: 100%; 
+}
+
+.main-content{
+    background-color: #212121;
+}
+
+.main-sidebar{
+    background-color: #272725;
+}
+

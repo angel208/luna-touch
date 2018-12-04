@@ -1,0 +1,4 @@
+{
+    "port":5004,
+    "queue_name": "luna-touch-queue"
+}

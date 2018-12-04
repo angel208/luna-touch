@@ -1,0 +1,45 @@
+.header{
+  color: rgb(241, 241, 241);
+  font-size: 14px;
+  background-color: #1C1C1C;
+  height:108px;
+  margin-bottom: 70px;
+}
+
+.title{
+  font-size:32px;
+  margin-left: 30px;
+}
+
+.form{
+  margin-top: 30px;
+}
+
+.input-field label {
+    color: rgb(241, 241, 241);
+  }
+  /* label focus color */
+  .input-field input[type=text]:focus + label {
+    color: #fff;
+  }
+  /* label underline focus color */
+  .input-field input[type=text]:focus {
+    border-bottom: 1px solid rgb(255, 255, 255);
+    box-shadow: 0 1px 0 0 rgb(255, 255, 255);
+    color: #fff;
+  }
+  /* valid color */
+  .input-field input[type=text].valid {
+    border-bottom: 1px solid #000;
+    box-shadow: 0 1px 0 0 #000;
+    color: #fff;
+  }
+  /* invalid color */
+  .input-field input[type=text].invalid {
+    border-bottom: 1px solid #000;
+    box-shadow: 0 1px 0 0 #000;
+  }
+  /* icon prefix focus color */
+  .input-field .prefix.active {
+    color: #000;
+  }

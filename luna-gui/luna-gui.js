@@ -5,6 +5,8 @@ const ipcMain = require('electron').ipcMain;
 
 const fs = require('fs');
 
+var async = require("async");
+
 //only for dev purposes!!
 require('electron-reload')(__dirname);
 /*require('electron-reload')(__dirname, {
@@ -56,6 +58,7 @@ app.on('ready', () => {
 
     createWindow();
 
+    
 })
 
 app.on('window-all-closed', () => {
@@ -70,6 +73,8 @@ app.on('activate', () => {
         createWindow()
     }
 })
+
+
 
 //------------------- IPC -------------------------
 

@@ -20,6 +20,8 @@ class Touch(object):
         self.timestamp = helpers.timestamp_in_milliseconds()
         self.delta_time = 0
 
+        #self.user = 0
+
     
     def __str__(self):
 

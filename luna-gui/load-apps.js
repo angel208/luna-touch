@@ -31,7 +31,7 @@ fs.readdir(appFolder, (err, app_folders) => {
             $('<div>').attr('class', 'card').append(
                 $('<button>').attr('class', 'app').attr('value', app_exec_path).append(
                     $('<div>').attr('class', 'card-image').append(
-                        $('<img>').attr('src', './icons/Luna Simple Piano.jpg')
+                        $('<img>').attr('src', './icons/Luna Simple Piano.png')
         ))))
 
 
